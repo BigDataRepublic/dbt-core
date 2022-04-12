@@ -1,0 +1,47 @@
+[tool.poetry]
+name = "dbt-core"
+version = "0.1.0"
+description = ""
+authors = ["Bram Neijt <bram@neijt.nl>"]
+packages = [
+    { include = "dbt", from = "plugins/postgres" },
+    { include = "dbt", from = "core" },
+]
+
+[tool.poetry.dependencies]
+python = "^3.9"
+PyYAML = "^6.0"
+Jinja2 = "2.11.3"
+MarkupSafe = "2.0.1"
+agate = ">=1.6,<1.6.4"
+click = ">=7.0,<9"
+colorama = ">=0.3.9,<0.4.5"
+hologram = "0.0.14"
+isodate = ">=0.6,<0.7"
+Logbook = ">=1.5,<1.6"
+mashumaro = "2.9"
+minimal-snowplow-tracker = "0.0.2"
+networkx = ">=2.3,<3"
+packaging = ">=20.9,<22.0"
+sqlparse = ">=0.2.3,<0.5"
+dbt-extractor = "~=0.4.1"
+typing-extensions = ">=3.7.4"
+Werkzeug = ">=1,<3"
+requests = "<3.0.0"
+idna = ">=2.5,<4"
+cffi = ">=1.9,<2.0.0"
+psycopg2-binary = "^2.9.3"
+
+[tool.poetry.dev-dependencies]
+pytest = "^7.1.1"
+black = "22.1.0"
+mypy = "0.782"
+flake8 = "^4.0.1"
+flaky = "^3.7.0"
+freezegun = "0.3.12"
+tox = "^3.25.0"
+ipdb = "^0.13.9"
+
+[build-system]
+requires = ["poetry-core>=1.0.0"]
+build-backend = "poetry.core.masonry.api"
