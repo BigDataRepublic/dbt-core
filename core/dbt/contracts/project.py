@@ -263,7 +263,7 @@ class ProfileConfig(HyphenatedDbtClassMixin, Replaceable):
     threads: int
     # TODO: make this a dynamic union of some kind?
     credentials: Optional[Dict[str, Any]]
-
+    manage_schema: Optional[bool]
 
 @dataclass
 class ConfiguredQuoting(Quoting, Replaceable):

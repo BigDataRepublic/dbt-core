@@ -20,7 +20,7 @@ from dbt.context.providers import generate_runtime_model_context
 from dbt.contracts.graph.compiled import CompileResultNode
 from dbt.contracts.graph.manifest import WritableManifest
 from dbt.contracts.graph.model_config import Hook
-from dbt.contracts.graph.parsed import ParsedHookNode
+from dbt.contracts.graph.parsed import ParsedHookNode, ParsedSourceDefinition
 from dbt.contracts.results import NodeStatus, RunResult, RunStatus, RunningStatus
 from dbt.exceptions import (
     CompilationException,
@@ -463,6 +463,7 @@ class RunTask(CompileTask):
         }
         with adapter.connection_named("master"):
             self.safe_run_hooks(adapter, RunHookType.End, extras)
+            self.manage_schema(adapter, results)
 
     def after_hooks(self, adapter, results, elapsed):
         self.print_results_line(results, elapsed)
@@ -483,3 +484,30 @@ class RunTask(CompileTask):
     def task_end_messages(self, results):
         if results:
             print_run_end_messages(results)
+
+    def manage_schema(self, adapter, results: List[RunResult]):
+        # adapter == postgressadapter
+        compile_nodes: List[ParsedSourceDefinition] = list(filter(lambda r: type(r.node) == ParsedSourceDefinition, results))
+        for r in results:
+            print(dir(r))
+            print(type(r))
+        database_schema_set: Set[Tuple[Optional[str], str]] = {
+            (r.node.database, r.node.schema, r.node.table)
+            for r in results
+            if r.node.is_relational
+            and r.status not in (NodeStatus.Error, NodeStatus.Fail, NodeStatus.Skipped)
+        }
+        print("DB", database_schema_set)
+        print("type of graph", self.graph.nodes().values())
+        # Find all models with manage_schema config
+        #   {%- for node in graph.nodes.values() | selectattr("resource_type", "equalto", "model") | list
+        # Collect "schema" next to manage_schema config
+        # Find a list of relations in a given schema
+        # List everything in the schema
+        # Drop the difference
+        print("TYPE IS", type(adapter))
+        print("DIR IS", adapter.list_relations())
+        # adapter.drop_relation()
+        # adapter.list_relations()
+        # self.config.project_name
+        assert type(adapter) == "asdf"
