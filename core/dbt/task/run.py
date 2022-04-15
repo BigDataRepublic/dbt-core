@@ -531,4 +531,4 @@ class RunTask(CompileTask):
         # adapter.drop_relation()
         # adapter.list_relations()
         # self.config.project_name
-        assert type(adapter) == "asdf"
+        assert False
