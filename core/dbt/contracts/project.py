@@ -181,6 +181,13 @@ BANNED_PROJECT_NAMES = {
 
 
 @dataclass
+class SchemaManagementConfiguration(HyphenatedDbtClassMixin, Replaceable):
+    database: Optional[str] = None
+    schema: Optional[str] = None
+    action: Optional[str] = None
+
+
+@dataclass
 class Project(HyphenatedDbtClassMixin, Replaceable):
     name: Name
     version: Union[SemverString, float]
@@ -254,13 +261,6 @@ class UserConfig(ExtensibleDbtClassMixin, Replaceable, UserConfigContract):
     use_experimental_parser: Optional[bool] = None
     static_parser: Optional[bool] = None
     indirect_selection: Optional[str] = None
-
-
-@dataclass
-class SchemaManagementConfiguration(HyphenatedDbtClassMixin, Replaceable):
-    database: Optional[str] = None
-    schema: Optional[str] = None
-    action: Optional[str] = None
 
 
 @dataclass
