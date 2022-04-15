@@ -200,6 +200,7 @@ class Project(HyphenatedDbtClassMixin, Replaceable):
     clean_targets: Optional[List[str]] = None
     profile: Optional[str] = None
     log_path: Optional[str] = None
+    managed_schemas: Optional[List[SchemaManagementConfiguration]] = None
     packages_install_path: Optional[str] = None
     quoting: Optional[Quoting] = None
     on_run_start: Optional[List[str]] = field(default_factory=list_str)
@@ -256,6 +257,13 @@ class UserConfig(ExtensibleDbtClassMixin, Replaceable, UserConfigContract):
 
 
 @dataclass
+class SchemaManagementConfiguration:
+    database: Optional[str] = None
+    schema: Optional[str] = None
+    action: Optional[str] = None
+
+
+@dataclass
 class ProfileConfig(HyphenatedDbtClassMixin, Replaceable):
     profile_name: str = field(metadata={"preserve_underscore": True})
     target_name: str = field(metadata={"preserve_underscore": True})
@@ -264,6 +272,7 @@ class ProfileConfig(HyphenatedDbtClassMixin, Replaceable):
     # TODO: make this a dynamic union of some kind?
     credentials: Optional[Dict[str, Any]]
     manage_schema: Optional[bool]
+
 
 @dataclass
 class ConfiguredQuoting(Quoting, Replaceable):
