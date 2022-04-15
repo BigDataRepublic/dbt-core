@@ -486,14 +486,31 @@ class RunTask(CompileTask):
             print_run_end_messages(results)
 
     def manage_schema(self, adapter, results: List[RunResult]):
-        # adapter == postgressadapter
-        manage_schema_enabled_for_target = True #TODO load from profile
+        # Read config
+        manage_schemas_config = self.config.manage_schemas
+        managed_schemas_config = [
+            (ms.database or '', ms.schema or '')
+            for ms in self.config.managed_schemas
+        ]
+
+        #TODO remove
+        assert type(manage_schemas_config) == bool
+        manage_schemas_config = True
+            
+        if not manage_schemas_config:
+            #TODO debug not doing anything
+            return
+
+        if len(managed_schemas_config) == 0:
+            print('WARN ENABLED MANAGEMENT, but nothing to manage')
+            return
+
+
         def shema_management_action_for(database_name, schema_name) -> Optional[str]:
             """Find the schema management action for a given schema"""
             #TOOD create enum or return callable action
             return 'warn'
         
-        manage_schemas_config = [('dbt', 'test')] #type: List[str] #TODO load from project
 
         #Never manage schema if we have a failed node
         was_successfull_complete_run = not any(r.status in (NodeStatus.Error, NodeStatus.Fail, NodeStatus.Skipped) for r in results)
@@ -512,18 +529,10 @@ class RunTask(CompileTask):
         model_management_actions: Dict[Tuple[str, str, str], str] = {
             (database_name, schema_name, identifier): shema_management_action_for(database_name, schema_name)
             for database_name, schema_name, identifier in models_in_results
-            if (database_name, schema_name) in manage_schemas_config
+            if (database_name, schema_name) in managed_schemas_config
         }
-        print("models", model_management_actions)
         
-        # Find all models with manage_schema config
-        #   {%- for node in graph.nodes.values() | selectattr("resource_type", "equalto", "model") | list
-        # Collect "schema" next to manage_schema config
-        # Find a list of relations in a given schema
-        # List everything in the schema
-        # Drop the difference
-        print("TYPE IS", type(adapter))
-        for database, schema in manage_schemas_config:
+        for database, schema in managed_schemas_config:
             available_models = {
                 (database, schema, relation.identifier): relation
                 for relation in adapter.list_relations(database, schema)
