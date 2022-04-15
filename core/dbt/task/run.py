@@ -488,12 +488,13 @@ class RunTask(CompileTask):
     def manage_schema(self, adapter, results: List[RunResult]):
         # adapter == postgressadapter
         manage_schema_enabled_for_target = True #TODO load from profile
-        def shema_management_action_for(database_name, schema_name) -> str:
+        def shema_management_action_for(database_name, schema_name) -> Optional[str]:
             """Find the schema management action for a given schema"""
             #TOOD create enum or return callable action
             return 'warn'
         
-        schemas_to_manage = ["test"] #type: List[str] #TODO load from project
+        manage_schemas_config = [('dbt', 'test')] #type: List[str] #TODO load from project
+
         #Never manage schema if we have a failed node
         was_successfull_complete_run = not any(r.status in (NodeStatus.Error, NodeStatus.Fail, NodeStatus.Skipped) for r in results)
         if not was_successfull_complete_run and manage_schema_enabled_for_target:
@@ -501,23 +502,19 @@ class RunTask(CompileTask):
             print("FAIL in models, skipping management")
             return
         #TODO error, we need to also konw about all seeds etc.
-        compile_nodes: List[ParsedSourceDefinition] = list(filter(lambda r: type(r.node) == ParsedSourceDefinition, results))
 
-        available_models: Set[Tuple[str, str, str]] = {
+        models_in_results: Set[Tuple[str, str, str]] = set(
             (r.node.database, r.node.schema, r.node.identifier)
             for r in results
             if r.node.is_relational
+        )
+
+        model_management_actions: Dict[Tuple[str, str, str], str] = {
+            (database_name, schema_name, identifier): shema_management_action_for(database_name, schema_name)
+            for database_name, schema_name, identifier in models_in_results
+            if (database_name, schema_name) in manage_schemas_config
         }
-        schema_management_actions = {
-            (database_name, schema_name): shema_management_action_for(database_name, schema_name)
-            for database_name, schema_name in set([(i[0], i[1]) for i in available_models])
-        }
-        print("schema_mamangement_actions", schema_management_actions)
-        managed_models = {
-            model_path for model_path in available_models
-            if model_path[1] in schema_management_actions.keys() 
-        }
-        print("models", managed_models)
+        print("models", model_management_actions)
         
         # Find all models with manage_schema config
         #   {%- for node in graph.nodes.values() | selectattr("resource_type", "equalto", "model") | list
@@ -526,8 +523,19 @@ class RunTask(CompileTask):
         # List everything in the schema
         # Drop the difference
         print("TYPE IS", type(adapter))
-        for database, schema in schema_management_actions.keys():
-            print("LIST", adapter.list_relations(database, schema))
+        for database, schema in manage_schemas_config:
+            available_models = {
+                (database, schema, relation.identifier): relation
+                for relation in adapter.list_relations(database, schema)
+            }
+            should_act_upon = available_models.keys() - models_in_results
+            for (database, schema, identifier) in should_act_upon:
+                if action == 'warn':
+                    print("WARN ABOUT ", database, schema, identifier)
+                elif action == 'drop':
+                    adapter.drop_relation(available_models[(database, schema, identifier)])
+
+        
         # adapter.drop_relation()
         # adapter.list_relations()
         # self.config.project_name
