@@ -145,6 +145,7 @@ class Profile(HasCredentials):
                 "target_name": self.target_name,
                 "profile_name": self.profile_name,
                 "config": self.user_config.to_dict(omit_none=True),
+                "manage_schemas": self.manage_schemas
             }
         )
         return target

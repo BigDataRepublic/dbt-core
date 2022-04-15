@@ -271,7 +271,7 @@ class ProfileConfig(HyphenatedDbtClassMixin, Replaceable):
     threads: int
     # TODO: make this a dynamic union of some kind?
     credentials: Optional[Dict[str, Any]]
-    manage_schemas: Optional[bool]
+    manage_schemas: Optional[bool] = field(metadata={"preserve_underscore": True})
 
 
 @dataclass
