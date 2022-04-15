@@ -10,7 +10,7 @@ from dbt.dataclass_schema import (
     ValidatedStringMixin,
 )
 from dataclasses import dataclass, field
-from typing import Optional, List, Dict, Union, Any, Literal
+from typing import Optional, List, Dict, Union, Any
 from mashumaro.types import SerializableType
 
 PIN_PACKAGE_URL = (
@@ -180,14 +180,11 @@ BANNED_PROJECT_NAMES = {
 }
 
 
-SchemaManagementAction = Literal["warn", "drop"]
-
-
 @dataclass
 class SchemaManagementConfiguration(HyphenatedDbtClassMixin, Replaceable):
     database: Optional[str] = None
     schema: Optional[str] = None
-    action: Optional[SchemaManagementAction] = None
+    action: Optional[str] = None
 
 
 @dataclass
