@@ -257,7 +257,7 @@ class UserConfig(ExtensibleDbtClassMixin, Replaceable, UserConfigContract):
 
 
 @dataclass
-class SchemaManagementConfiguration:
+class SchemaManagementConfiguration(HyphenatedDbtClassMixin, Replaceable):
     database: Optional[str] = None
     schema: Optional[str] = None
     action: Optional[str] = None
