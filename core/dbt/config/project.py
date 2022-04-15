@@ -36,6 +36,7 @@ from dbt.config.selectors import SelectorDict
 from dbt.contracts.project import (
     Project as ProjectContract,
     SemverString,
+    SchemaManagementConfiguration
 )
 from dbt.contracts.project import PackageConfig
 from dbt.dataclass_schema import ValidationError
@@ -434,6 +435,7 @@ class PartialProject(RenderComponents):
             config_version=cfg.config_version,
             unrendered=unrendered,
             project_env_vars=project_env_vars,
+            managed_schemas=cfg.managed_schemas
         )
         # sanity check - this means an internal issue
         project.validate()
@@ -541,6 +543,7 @@ class Project:
     config_version: int
     unrendered: RenderComponents
     project_env_vars: Dict[str, Any]
+    managed_schemas: List[SchemaManagementConfiguration]
 
     @property
     def all_source_paths(self) -> List[str]:
