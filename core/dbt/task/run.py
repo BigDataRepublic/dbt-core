@@ -20,7 +20,7 @@ from dbt.context.providers import generate_runtime_model_context
 from dbt.contracts.graph.compiled import CompileResultNode
 from dbt.contracts.graph.manifest import WritableManifest
 from dbt.contracts.graph.model_config import Hook
-from dbt.contracts.graph.parsed import ParsedHookNode, ParsedSourceDefinition
+from dbt.contracts.graph.parsed import ParsedHookNode
 from dbt.contracts.results import NodeStatus, RunResult, RunStatus, RunningStatus
 from dbt.exceptions import (
     CompilationException,
@@ -487,38 +487,33 @@ class RunTask(CompileTask):
 
     def manage_schema(self, adapter, results: List[RunResult]):
         # Read config
-        manage_schemas_config = self.config.manage_schemas
-        managed_schemas_config = [
-            (ms.database or '', ms.schema or '')
+        manage_schemas_config = self.config.manage_schemas  # type: bool
+        managed_schemas_actions_config: Dict[Tuple[str, str], str] = {
+            (ms.database or "", ms.schema or ""): ms.action or "warn"
             for ms in self.config.managed_schemas
-        ]
+        }
 
-        #TODO remove
-        assert type(manage_schemas_config) == bool
+        # TODO remove
         manage_schemas_config = True
-            
+        managed_schemas_actions_config = {("a", "b"): "warn"}
+
         if not manage_schemas_config:
-            #TODO debug not doing anything
+            # TODO debug not doing anything
             return
 
-        if len(managed_schemas_config) == 0:
-            print('WARN ENABLED MANAGEMENT, but nothing to manage')
+        if len(managed_schemas_actions_config) == 0:
+            print("WARN ENABLED MANAGEMENT, but nothing to manage, see documentation")
             return
 
-
-        def shema_management_action_for(database_name, schema_name) -> Optional[str]:
-            """Find the schema management action for a given schema"""
-            #TOOD create enum or return callable action
-            return 'warn'
-        
-
-        #Never manage schema if we have a failed node
-        was_successfull_complete_run = not any(r.status in (NodeStatus.Error, NodeStatus.Fail, NodeStatus.Skipped) for r in results)
-        if not was_successfull_complete_run and manage_schema_enabled_for_target:
+        # Never manage schema if we have a failed node
+        was_successfull_complete_run = not any(
+            r.status in (NodeStatus.Error, NodeStatus.Fail, NodeStatus.Skipped) for r in results
+        )
+        if not was_successfull_complete_run and manage_schemas_config:
             # TODO log we do not run because of a model failed
             print("FAIL in models, skipping management")
             return
-        #TODO error, we need to also konw about all seeds etc.
+        # TODO error, we need to also konw about all seeds etc.
 
         models_in_results: Set[Tuple[str, str, str]] = set(
             (r.node.database, r.node.schema, r.node.identifier)
@@ -526,25 +521,21 @@ class RunTask(CompileTask):
             if r.node.is_relational
         )
 
-        model_management_actions: Dict[Tuple[str, str, str], str] = {
-            (database_name, schema_name, identifier): shema_management_action_for(database_name, schema_name)
-            for database_name, schema_name, identifier in models_in_results
-            if (database_name, schema_name) in managed_schemas_config
-        }
-        
-        for database, schema in managed_schemas_config:
-            available_models = {
+        for database, schema in managed_schemas_actions_config.keys():
+            available_models: Dict[Tuple[str, str, str], str] = {
                 (database, schema, relation.identifier): relation
                 for relation in adapter.list_relations(database, schema)
             }
             should_act_upon = available_models.keys() - models_in_results
-            for (database, schema, identifier) in should_act_upon:
-                if action == 'warn':
-                    print("WARN ABOUT ", database, schema, identifier)
-                elif action == 'drop':
-                    adapter.drop_relation(available_models[(database, schema, identifier)])
+            for (target_database, target_schema, target_identifier) in should_act_upon:
+                target_action = managed_schemas_actions_config[(target_database, target_schema)]
+                if target_action == "warn":
+                    print("WARN ABOUT ", target_database, target_schema, target_identifier)
+                elif target_action == "drop":
+                    adapter.drop_relation(
+                        available_models[(target_database, target_schema, target_identifier)]
+                    )
 
-        
         # adapter.drop_relation()
         # adapter.list_relations()
         # self.config.project_name

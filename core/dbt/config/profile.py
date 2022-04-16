@@ -100,7 +100,7 @@ class Profile(HasCredentials):
         user_config: UserConfig,
         threads: int,
         credentials: Credentials,
-        manage_schemas: bool
+        manage_schemas: bool,
     ):
         """Explicitly defining `__init__` to work around bug in Python 3.9.7
         https://bugs.python.org/issue45081
@@ -128,7 +128,7 @@ class Profile(HasCredentials):
             "user_config": self.user_config,
             "threads": self.threads,
             "credentials": self.credentials,
-            "manage_schemas": self.manage_schemas
+            "manage_schemas": self.manage_schemas,
         }
         if serialize_credentials:
             result["user_config"] = self.user_config.to_dict(omit_none=True)
@@ -145,7 +145,7 @@ class Profile(HasCredentials):
                 "target_name": self.target_name,
                 "profile_name": self.profile_name,
                 "config": self.user_config.to_dict(omit_none=True),
-                "manage_schemas": self.manage_schemas
+                "manage_schemas": self.manage_schemas,
             }
         )
         return target
@@ -245,7 +245,7 @@ class Profile(HasCredentials):
         profile_name: str,
         target_name: str,
         user_config: Optional[Dict[str, Any]] = None,
-        manage_schemas: bool = False
+        manage_schemas: bool = False,
     ) -> "Profile":
         """Create a profile from an existing set of Credentials and the
         remaining information.
@@ -270,7 +270,7 @@ class Profile(HasCredentials):
             user_config=user_config_obj,
             threads=threads,
             credentials=credentials,
-            manage_schemas=manage_schemas or False
+            manage_schemas=manage_schemas or False,
         )
         profile.validate()
         return profile
@@ -362,7 +362,7 @@ class Profile(HasCredentials):
             target_name=target_name,
             threads=threads,
             user_config=user_config,
-            manage_schemas=False #TODO
+            manage_schemas=False,  # TODO
         )
 
     @classmethod

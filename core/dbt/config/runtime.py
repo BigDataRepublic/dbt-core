@@ -119,7 +119,7 @@ class RuntimeConfig(Project, Profile, AdapterRequiredConfig):
             cli_vars=cli_vars,
             dependencies=dependencies,
             manage_schemas=profile.manage_schemas,
-            managed_schemas=project.managed_schemas or []
+            managed_schemas=project.managed_schemas or [],
         )
 
     # Called by 'load_projects' in this class

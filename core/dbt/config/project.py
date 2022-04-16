@@ -36,7 +36,7 @@ from dbt.config.selectors import SelectorDict
 from dbt.contracts.project import (
     Project as ProjectContract,
     SemverString,
-    SchemaManagementConfiguration
+    SchemaManagementConfiguration,
 )
 from dbt.contracts.project import PackageConfig
 from dbt.dataclass_schema import ValidationError
@@ -435,7 +435,7 @@ class PartialProject(RenderComponents):
             config_version=cfg.config_version,
             unrendered=unrendered,
             project_env_vars=project_env_vars,
-            managed_schemas=cfg.managed_schemas
+            managed_schemas=cfg.managed_schemas,
         )
         # sanity check - this means an internal issue
         project.validate()
