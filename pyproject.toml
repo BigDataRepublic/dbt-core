@@ -31,11 +31,11 @@ requests = "<3.0.0"
 idna = ">=2.5,<4"
 cffi = ">=1.9,<2.0.0"
 psycopg2-binary = "^2.9.3"
-pre-commit = "^2.18.1"
 
 [tool.poetry.dev-dependencies]
+pre-commit = "^2.18.1"
 pytest = "^7.1.1"
-black = "22.1.0"
+black = "^22.3.0"
 mypy = "0.782"
 flake8 = "^4.0.1"
 flaky = "^3.7.0"
