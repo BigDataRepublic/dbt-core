@@ -9,7 +9,7 @@ packages = [
 ]
 
 [tool.poetry.dependencies]
-python = "^3.9"
+python = "^3.8"
 PyYAML = "^6.0"
 Jinja2 = "2.11.3"
 MarkupSafe = "2.0.1"
@@ -31,6 +31,7 @@ requests = "<3.0.0"
 idna = ">=2.5,<4"
 cffi = ">=1.9,<2.0.0"
 psycopg2-binary = "^2.9.3"
+pre-commit = "^2.18.1"
 
 [tool.poetry.dev-dependencies]
 pytest = "^7.1.1"
