@@ -23,6 +23,7 @@ from dbt.contracts.graph.model_config import Hook
 from dbt.contracts.graph.parsed import ParsedHookNode
 from dbt.contracts.results import NodeStatus, RunResult, RunStatus, RunningStatus
 from dbt.exceptions import (
+    warn_or_error,
     CompilationException,
     InternalException,
     RuntimeException,
@@ -494,16 +495,12 @@ class RunTask(CompileTask):
             for ms in self.config.managed_schemas
         }
 
-        # TODO remove
-        manage_schemas_config = True
-        managed_schemas_actions_config = {("a", "b"): "warn"}
-
         if not manage_schemas_config:
             # TODO debug not doing anything
             return
 
         if len(managed_schemas_actions_config) == 0:
-            print("WARN ENABLED MANAGEMENT, but nothing to manage, see documentation")
+            warn_or_error("Schema management enabled for connection but no schema's configured to manage")
             return
 
         # Never manage schema if we have a failed node
@@ -511,15 +508,13 @@ class RunTask(CompileTask):
             r.status in (NodeStatus.Error, NodeStatus.Fail, NodeStatus.Skipped) for r in results
         )
         if not was_successfull_complete_run and manage_schemas_config:
-            # TODO log we do not run because of a model failed
-            print("FAIL in models, skipping management")
+            warn_or_error("One or more models failed, skipping schema management")
             return
-        # TODO error, we need to also konw about all seeds etc.
 
         models_in_results: Set[Tuple[str, str, str]] = set(
             (r.node.database, r.node.schema, r.node.identifier)
             for r in results
-            if r.node.is_relational
+            if (r.node.is_relational and not r.node.is_ephemeral_model)
         )
 
         for database, schema in managed_schemas_actions_config.keys():
@@ -537,7 +532,3 @@ class RunTask(CompileTask):
                         available_models[(target_database, target_schema, target_identifier)]
                     )
 
-        # adapter.drop_relation()
-        # adapter.list_relations()
-        # self.config.project_name
-        assert False
