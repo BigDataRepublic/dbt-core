@@ -91,7 +91,6 @@ class Profile(HasCredentials):
     threads: int
     credentials: Credentials
     profile_env_vars: Dict[str, Any]
-    manage_schemas: bool
 
     def __init__(
         self,
@@ -100,7 +99,6 @@ class Profile(HasCredentials):
         user_config: UserConfig,
         threads: int,
         credentials: Credentials,
-        manage_schemas: bool,
     ):
         """Explicitly defining `__init__` to work around bug in Python 3.9.7
         https://bugs.python.org/issue45081
@@ -111,7 +109,6 @@ class Profile(HasCredentials):
         self.threads = threads
         self.credentials = credentials
         self.profile_env_vars = {}  # never available on init
-        self.manage_schemas = manage_schemas
 
     def to_profile_info(self, serialize_credentials: bool = False) -> Dict[str, Any]:
         """Unlike to_project_config, this dict is not a mirror of any existing
@@ -128,7 +125,6 @@ class Profile(HasCredentials):
             "user_config": self.user_config,
             "threads": self.threads,
             "credentials": self.credentials,
-            "manage_schemas": self.manage_schemas,
         }
         if serialize_credentials:
             result["user_config"] = self.user_config.to_dict(omit_none=True)
@@ -145,7 +141,6 @@ class Profile(HasCredentials):
                 "target_name": self.target_name,
                 "profile_name": self.profile_name,
                 "config": self.user_config.to_dict(omit_none=True),
-                "manage_schemas": self.manage_schemas,
             }
         )
         return target
