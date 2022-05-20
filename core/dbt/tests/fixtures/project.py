@@ -432,7 +432,8 @@ class TestProjInfo:
 
     def update_models(self, models: dict):
         """Update the modules in the test project"""
-        write_project_files(project_root, "models", models)
+        self.project_root.join("models").remove()
+        write_project_files(self.project_root, "models", models)
 
 
 # This is the main fixture that is used in all functional tests. It pulls in the other
