@@ -91,6 +91,7 @@ class Profile(HasCredentials):
     threads: int
     credentials: Credentials
     profile_env_vars: Dict[str, Any]
+    manage_schemas: bool
 
     def __init__(
         self,
@@ -99,6 +100,7 @@ class Profile(HasCredentials):
         user_config: UserConfig,
         threads: int,
         credentials: Credentials,
+        manage_schemas: bool = False,
     ):
         """Explicitly defining `__init__` to work around bug in Python 3.9.7
         https://bugs.python.org/issue45081
@@ -265,7 +267,7 @@ class Profile(HasCredentials):
             user_config=user_config_obj,
             threads=threads,
             credentials=credentials,
-            manage_schemas=manage_schemas or False,
+            manage_schemas=manage_schemas,
         )
         profile.validate()
         return profile

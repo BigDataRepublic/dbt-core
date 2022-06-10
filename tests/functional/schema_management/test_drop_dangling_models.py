@@ -48,7 +48,7 @@ class TestDanglingModels:
     @pytest.fixture(scope="class")
     def project_config_update(self):
         return {
-            "manage_schemas": [
+            "managed_schemas": [
                 {
                     "database": os.getenv("POSTGRES_TEST_DATABASE", "dbt"),
                     "schema": "dbt",
