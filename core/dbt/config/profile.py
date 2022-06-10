@@ -360,7 +360,7 @@ class Profile(HasCredentials):
             target_name=target_name,
             threads=threads,
             user_config=user_config,
-            manage_schemas=False,  # TODO
+            manage_schemas=profile_data.get("manage_schemas", False),
         )
 
     @classmethod

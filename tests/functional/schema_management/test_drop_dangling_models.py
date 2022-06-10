@@ -1,7 +1,11 @@
 import pytest
 import os
 
-from dbt.tests.util import run_dbt, check_table_does_exist, check_table_does_not_exist, write_file
+from dbt.tests.util import (
+    run_dbt,
+    check_table_does_exist,
+    check_table_does_not_exist,
+)
 
 model = """
 {{
@@ -9,24 +13,18 @@ model = """
     materialized = "table"
   )
 }}
-
-with source_data as (
-
-        select 1 as id
-union all
-select null as id
-
-)
-
-select *
-from source_data
+SELECT * FROM (
+VALUES (1, 'one'),
+ (2, 'two'),
+ (3, 'three')
+) AS t (num,letter)
 """
 
 
 @pytest.fixture(scope="class")
 def models():
     return {
-        "users.sql": model,
+        "numbers.sql": model,
     }
 
 
@@ -61,12 +59,12 @@ class TestDanglingModels:
         self,
         project,
     ):
-        # create users model
+        # create numbers model
         run_dbt(["run"])
-        check_table_does_exist(project.adapter, "users")
+        check_table_does_exist(project.adapter, "numbers")
         check_table_does_not_exist(project.adapter, "baz")
 
-        # remove users model
+        # remove numbers model
         project.update_models({})
         run_dbt(["run"])
-        check_table_does_not_exist(project.adapter, "users")
+        check_table_does_not_exist(project.adapter, "numbers")

@@ -24,6 +24,7 @@ from dbt.contracts.graph.parsed import ParsedHookNode
 from dbt.contracts.results import NodeStatus, RunResult, RunStatus, RunningStatus
 from dbt.exceptions import (
     warn_or_error,
+    warn,
     CompilationException,
     InternalException,
     RuntimeException,
@@ -497,6 +498,7 @@ class RunTask(CompileTask):
 
         if not manage_schemas_config:
             # TODO debug not doing anything
+            warn("Schema's configured to be managed, but manage_schemas is false in the profile")
             return
 
         if len(managed_schemas_actions_config) == 0:
