@@ -510,7 +510,7 @@ class RunTask(CompileTask):
             r.status in (NodeStatus.Error, NodeStatus.Fail, NodeStatus.Skipped) for r in results
         )
         if not was_successfull_complete_run and manage_schemas_config:
-            warn_or_error("One or more models failed, skipping schema management")
+            warn("One or more models failed, skipping schema management")
             return
 
         models_in_results: Set[Tuple[str, str, str]] = set(
@@ -524,6 +524,8 @@ class RunTask(CompileTask):
                 (database, schema, relation.identifier): relation
                 for relation in adapter.list_relations(database, schema)
             }
+            if len(available_models) == 0:
+                warn_or_error(f"No modules in managed schema '{schema}' for database '{database}'")
             should_act_upon = available_models.keys() - models_in_results
             for (target_database, target_schema, target_identifier) in should_act_upon:
                 target_action = managed_schemas_actions_config[(target_database, target_schema)]
