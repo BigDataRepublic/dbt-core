@@ -601,7 +601,7 @@ class Project:
                 "asset-paths": self.asset_paths,
                 "target-path": self.target_path,
                 "snapshot-paths": self.snapshot_paths,
-                "managed-schemas": self.managed_schemas,
+                "managed-schemas": [schema.to_dict() for schema in self.managed_schemas],
                 "clean-targets": self.clean_targets,
                 "log-path": self.log_path,
                 "quoting": self.quoting,

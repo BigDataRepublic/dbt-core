@@ -111,6 +111,7 @@ class Profile(HasCredentials):
         self.threads = threads
         self.credentials = credentials
         self.profile_env_vars = {}  # never available on init
+        self.manage_schemas = manage_schemas
 
     def to_profile_info(self, serialize_credentials: bool = False) -> Dict[str, Any]:
         """Unlike to_project_config, this dict is not a mirror of any existing
