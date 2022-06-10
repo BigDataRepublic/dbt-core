@@ -349,12 +349,13 @@ class PartialProject(RenderComponents):
         )
         test_paths: List[str] = value_or(cfg.test_paths, ["tests"])
         analysis_paths: List[str] = value_or(cfg.analysis_paths, ["analyses"])
-        snapshot_paths: List[str] = value_or(cfg.snapshot_paths, ["snapshots"])
+        snapshot_paths: List[SchemaManagementConfiguration] = value_or(cfg.snapshot_paths, ["snapshots"])
 
         all_source_paths: List[str] = _all_source_paths(
             model_paths, seed_paths, snapshot_paths, analysis_paths, macro_paths
         )
 
+        managed_schemas: List[str] = value_or(cfg.managed_schemas, [])
         docs_paths: List[str] = value_or(cfg.docs_paths, all_source_paths)
         asset_paths: List[str] = value_or(cfg.asset_paths, [])
         target_path: str = value_or(cfg.target_path, "target")
@@ -418,6 +419,7 @@ class PartialProject(RenderComponents):
             asset_paths=asset_paths,
             target_path=target_path,
             snapshot_paths=snapshot_paths,
+            managed_schemas=managed_schemas,
             clean_targets=clean_targets,
             log_path=log_path,
             packages_install_path=packages_install_path,
@@ -439,7 +441,6 @@ class PartialProject(RenderComponents):
             config_version=cfg.config_version,
             unrendered=unrendered,
             project_env_vars=project_env_vars,
-            managed_schemas=cfg.managed_schemas,
         )
         # sanity check - this means an internal issue
         project.validate()
@@ -526,6 +527,7 @@ class Project:
     asset_paths: List[str]
     target_path: str
     snapshot_paths: List[str]
+    managed_schemas: List[SchemaManagementConfiguration]
     clean_targets: List[str]
     log_path: str
     packages_install_path: str
@@ -547,7 +549,6 @@ class Project:
     config_version: int
     unrendered: RenderComponents
     project_env_vars: Dict[str, Any]
-    managed_schemas: List[SchemaManagementConfiguration]
 
     @property
     def all_source_paths(self) -> List[str]:
@@ -600,6 +601,7 @@ class Project:
                 "asset-paths": self.asset_paths,
                 "target-path": self.target_path,
                 "snapshot-paths": self.snapshot_paths,
+                "managed-schemas": self.managed_schemas,
                 "clean-targets": self.clean_targets,
                 "log-path": self.log_path,
                 "quoting": self.quoting,

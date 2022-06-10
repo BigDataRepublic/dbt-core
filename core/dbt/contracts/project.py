@@ -204,10 +204,10 @@ class Project(HyphenatedDbtClassMixin, Replaceable):
     asset_paths: Optional[List[str]] = None
     target_path: Optional[str] = None
     snapshot_paths: Optional[List[str]] = None
+    managed_schemas: Optional[List[SchemaManagementConfiguration]] = None
     clean_targets: Optional[List[str]] = None
     profile: Optional[str] = None
     log_path: Optional[str] = None
-    managed_schemas: Optional[List[SchemaManagementConfiguration]] = None
     packages_install_path: Optional[str] = None
     quoting: Optional[Quoting] = None
     on_run_start: Optional[List[str]] = field(default_factory=list_str)
